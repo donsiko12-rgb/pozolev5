@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pozole Express</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Firebase SDK (Modular) will be loaded via JS Modules -->
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app-container" class="app-container">
+        
+        <!-- Header / Logo Area (Dynamic) -->
+        <header id="main-header" class="main-header hidden">
+            <div class="logo-container">
+                <h1 class="logo-text">POZOLE <span class="logo-accent">EXPRESS</span></h1>
+            </div>
+            <div id="cart-badge-container" class="cart-badge-container hidden">
+                <span class="icon-cart">🛒</span>
+                <span id="cart-count" class="cart-count">0</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="main-content">
+            <!-- Loading Screen -->
+            <section id="view-loading" class="view active">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <p>Cargando sabor casero...</p>
+                </div>
+            </section>
+
+            <!-- Authentication Views -->
+            <section id="view-auth" class="view">
+                <div class="auth-container">
+                    <div class="auth-logo">
+                        <h1>POZOLE<br><span class="logo-accent">EXPRESS</span></h1>
+                        <p class="subtitle">Sabor Casero, Envío Rápido</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="form-login" class="auth-form active">
+                        <h2>Iniciar Sesión</h2>
+                        <div class="input-group">
+                            <label for="login-email">Correo Electrónico</label>
+                            <input type="email" id="login-email" required placeholder="tu@correo.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" required placeholder="********">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                        <p class="auth-switch">¿No tienes cuenta? <a href="#" id="link-register">Regístrate</a></p>
+                        <p id="login-error" class="error-message"></p>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="form-register" class="auth-form">
+                        <h2>Crear Cuenta</h2>
+                        <div class="input-group">
+                            <label for="reg-name">Nombre Completo</label>
+                            <input type="text" id="reg-name" required placeholder="Juan Pérez">
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-address">Dirección (Calle, #, Colonia)</label>
+                            <input type="text" id="reg-address" required placeholder="Av. Siempre Viva 123, Centro">
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-phone">Teléfono</label>
+                            <input type="tel" id="reg-phone" required placeholder="5551234567">
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-email">Correo Electrónico</label>
+                            <input type="email" id="reg-email" required placeholder="tu@correo.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-password">Contraseña</label>
+                            <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+                        <p class="auth-switch">¿Ya tienes cuenta? <a href="#" id="link-login">Inicia Sesión</a></p>
+                        <p id="reg-error" class="error-message"></p>
+                    </form>
+                </div>
+            </section>
+
+            <!-- User Panel Views -->
+            
+            <!-- 1. Menu View -->
+            <section id="view-menu" class="view">
+                <div class="view-header">
+                    <h2>Menú Principal</h2>
+                    <p class="subtitle">Agrega tus favoritos al carrito</p>
+                </div>
+                <div id="product-list" class="product-list">
+                    <!-- Products injected via JS -->
+                </div>
+            </section>
+
+            <!-- 2. Cart View -->
+            <section id="view-cart" class="view">
+                <div class="view-header">
+                    <h2>Tu Pedido</h2>
+                </div>
+                <div id="cart-items" class="cart-items">
+                    <!-- Cart items injected via JS -->
+                </div>
+                
+                <div id="cart-empty-message" class="empty-state hidden">
+                    <p>Tu carrito está vacío</p>
+                    <button class="btn btn-secondary btn-small" onclick="app.navigate('menu')">Ir al Menú</button>
+                </div>
+
+                <div id="cart-summary" class="cart-summary hidden">
+                    <div class="summary-row total">
+                        <span>Total a Pagar</span>
+                        <span id="cart-total-price">$0.00</span>
+                    </div>
+                    <button id="btn-continue-checkout" class="btn btn-primary btn-block">Continuar Compra</button>
+                </div>
+            </section>
+
+            <!-- Checkout Flow -->
+            <section id="view-checkout" class="view">
+                <!-- Step 1: Location -->
+                <div id="checkout-step-1" class="checkout-step active">
+                    <div class="view-header">
+                        <h2>Ubicación de Entrega</h2>
+                        <p class="subtitle">Confirma dónde entregaremos</p>
+                    </div>
+                    
+                    <div class="map-container">
+                        <div id="delivery-map"></div>
+                        <button id="btn-gps" class="btn-icon gps-button" title="Usar mi ubicación actual">📍</button>
+                    </div>
+                    <p class="map-hint">Puedes mover el mapa para ajustar la ubicación exacta.</p>
+                    
+                    <div class="input-group">
+                        <label for="delivery-address-details">Detalles de dirección (Interior, referencias)</label>
+                        <input type="text" id="delivery-address-details" placeholder="Ej. Casa roja rejas negras">
+                    </div>
+
+                    <div class="checkout-actions">
+                        <button class="btn btn-outline" onclick="app.navigate('cart')">Volver</button>
+                        <button id="btn-checkout-next-1" class="btn btn-primary">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment -->
+                <div id="checkout-step-2" class="checkout-step">
+                    <div class="view-header">
+                        <h2>Detalles de Pago</h2>
+                    </div>
+                    <div class="payment-info card">
+                        <h3>Total del Pedido: <span id="checkout-total-display">$0.00</span></h3>
+                    </div>
+                    <div class="input-group mt-4">
+                        <label for="payment-cash">¿Con cuánto efectivo vas a pagar?</label>
+                        <input type="number" id="payment-cash" placeholder="Cantidad en pesos" min="0">
+                        <small id="payment-change-hint" class="hint-text"></small>
+                    </div>
+                    
+                    <div class="checkout-actions">
+                        <button id="btn-checkout-prev-2" class="btn btn-outline">Volver</button>
+                        <button id="btn-checkout-next-2" class="btn btn-primary">Revisar Pedido</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="checkout-step-3" class="checkout-step">
+                    <div class="view-header">
+                        <h2>Confirmar Pedido</h2>
+                    </div>
+                    <div class="confirmation-summary card">
+                        <div class="summary-section">
+                            <h3>Productos</h3>
+                            <ul id="checkout-summary-items" class="summary-list"></ul>
+                        </div>
+                        <div class="summary-section">
+                            <h3>Entrega</h3>
+                            <p id="checkout-summary-address"></p>
+                        </div>
+                        <div class="summary-section">
+                            <h3>Pago</h3>
+                            <p>Efectivo: <span id="checkout-summary-cash"></span></p>
+                            <p>Cambio: <span id="checkout-summary-change"></span></p>
+                        </div>
+                        <div class="summary-total">
+                            <h3>Total: <span id="checkout-summary-total"></span></h3>
+                        </div>
+                        <p id="checkout-error" class="error-message"></p>
+                    </div>
+                    
+                    <div class="checkout-actions">
+                        <button id="btn-checkout-prev-3" class="btn btn-outline">Volver</button>
+                        <button id="btn-confirm-order" class="btn btn-primary btn-pulse">¡Confirmar Pedido!</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Orders View -->
+            <section id="view-orders" class="view">
+                <div class="view-header">
+                    <h2>Tus Pedidos</h2>
+                </div>
+                <div id="orders-list" class="orders-list">
+                    <!-- Orders injected via JS -->
+                </div>
+            </section>
+
+            <!-- 4. Profile View -->
+            <section id="view-profile" class="view">
+                <div class="view-header">
+                    <h2>Perfil</h2>
+                </div>
+                <div class="profile-card card">
+                    <div class="profile-avatar">👤</div>
+                    <h3 id="profile-name">Cargando...</h3>
+                    <p id="profile-phone" class="text-muted"></p>
+                    <p id="profile-email" class="text-muted"></p>
+                    <div class="divider"></div>
+                    <div class="profile-details">
+                        <h4>Dirección Principal</h4>
+                        <p id="profile-address">Cargando...</p>
+                    </div>
+                </div>
+                <button id="btn-logout" class="btn btn-outline btn-block mt-4 btn-danger">Cerrar Sesión</button>
+            </section>
+
+
+            <!-- Admin Views -->
+            
+            <!-- Admin: Orders -->
+            <section id="view-admin-orders" class="view">
+                <div class="view-header admin-header">
+                    <h2>Panel Admin - Pedidos</h2>
+                    <span class="badge badge-admin">ADMIN</span>
+                </div>
+                <div class="admin-filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="pending">Activos</button>
+                </div>
+                <div id="admin-orders-list" class="admin-orders-list">
+                    <!-- Admin orders injected via JS -->
+                </div>
+            </section>
+
+            <!-- Admin: Products -->
+            <section id="view-admin-products" class="view">
+                <div class="view-header admin-header">
+                    <h2>Panel Admin - Productos</h2>
+                    <span class="badge badge-admin">ADMIN</span>
+                </div>
+                <div id="admin-products-list" class="admin-products-list">
+                    <!-- Admin products injected via JS -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation Bar (Client) -->
+        <nav id="bottom-nav" class="bottom-nav hidden">
+            <a href="#" class="nav-item active" data-target="menu">
+                <span class="nav-icon">🍲</span>
+                <span class="nav-label">Menú</span>
+            </a>
+            <a href="#" class="nav-item" data-target="cart">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">Carrito</span>
+            </a>
+            <a href="#" class="nav-item" data-target="orders">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Pedidos</span>
+            </a>
+            <a href="#" class="nav-item" data-target="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Perfil</span>
+            </a>
+        </nav>
+
+        <!-- Bottom Navigation Bar (Admin) -->
+        <nav id="admin-bottom-nav" class="bottom-nav admin-nav hidden">
+            <a href="#" class="nav-item active" data-target="admin-orders">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Pedidos Entrantes</span>
+            </a>
+            <a href="#" class="nav-item" data-target="admin-products">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Productos</span>
+            </a>
+            <a href="#" class="nav-item" data-target="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Perfil</span>
+            </a>
+        </nav>
+        
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
