@@ -1,5 +1,5 @@
 import { addToCart, removeFromCart } from './cart.js';
-import { toggleProductStatus, updateOrderStatus } from './db.js';
+import { toggleProductStatus, updateOrderStatus } from './database.js';
 
 export function init() {
     window.uiState = {

@@ -2,9 +2,9 @@
 import { auth } from './firebase-config.js';
 import * as AuthLogic from './auth.js';
 import * as UILogic from './ui.js';
-import * as DBLogic from './db.js';
+import * as DBLogic from './database.js';
 import * as CartLogic from './cart.js';
-import * as MapLogic from './map.js';
+import * as MapLogic from './map-view.js';
 
 // Global App State
 const state = {
