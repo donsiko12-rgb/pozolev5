@@ -40,7 +40,7 @@ export function renderProducts(products, currentCart) {
         let sub = p.desc;
         let imgSrc = '';
 
-        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = "IMPOSIBLE COMERSE UN SOLO PLATO"; sub = "POZOL TOST"; imgSrc = "pozole.png"; }
+        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = p.name.toUpperCase(); sub = "POZOL TOST"; imgSrc = "pozole.png"; }
         else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; imgSrc = "cocacola.png"; }
         else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; imgSrc = "aguasabor.png"; }
         else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; imgSrc = "tostadatinga.png"; }
