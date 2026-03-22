@@ -7,6 +7,7 @@ let map = null;
 let marker = null;
 let currentPos = { lat: 19.4326, lng: -99.1332 }; // default CDMX
 let initialized = false;
+let isProcessingOrder = false;
 
 // Delivery Params
 const orderParams = {
@@ -151,6 +152,9 @@ function bindCheckoutEvents() {
 
     // Confirm Order
     document.getElementById('btn-confirm-order').addEventListener('click', async () => {
+        if (isProcessingOrder) return;
+        isProcessingOrder = true;
+
         const btn = document.getElementById('btn-confirm-order');
         btn.disabled = true;
         btn.textContent = "Procesando...";
@@ -159,8 +163,8 @@ function bindCheckoutEvents() {
         const finalOrder = {
             userId: state.user.uid,
             customerParams: {
-                name: document.getElementById('profile-name')?.textContent || 'Cliente',
-                phone: document.getElementById('profile-phone')?.textContent || 'S/N',
+                name: state.userProfile?.name || 'Cliente',
+                phone: state.userProfile?.phone || 'S/N',
             },
             items: cartItems,
             total: getCartTotal(),
@@ -180,12 +184,14 @@ function bindCheckoutEvents() {
                 window.app.navigate('orders');
                 btn.disabled = false;
                 btn.textContent = "¡Confirmar Pedido!";
+                isProcessingOrder = false;
             }, 1000);
 
         } catch(e) {
             showToast("Hubo un error al procesar el pedido.");
             btn.disabled = false;
             btn.textContent = "Reintentar";
+            isProcessingOrder = false;
         }
     });
 }
