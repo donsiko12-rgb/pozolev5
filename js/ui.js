@@ -175,12 +175,10 @@ export function renderClientOrders(orders) {
                 <span class="order-total">$${Number(o.total).toFixed(2)}</span>
                 <span class="order-date" style="font-weight:bold; color:var(--color-dark);">Total</span>
             </div>
-            <div class="order-status-tracker">
-                <div class="tracker-img-container">
-                    <img src="img/status.png" class="status-img pos-${safeStatus}" alt="${o.status}">
-                </div>
-                <div class="tracker-bar">
-                    <div class="tracker-progress prog-${safeStatus}"></div>
+            <div class="status-graphic-container">
+                <div class="status-graphic">
+                    <img src="img/status.png" class="img-base" alt="Tracker Base">
+                    <img src="img/status.png" class="img-color prog-${safeStatus}" alt="Tracker">
                 </div>
                 <div class="tracker-labels">
                     <span class="${safeStatus === 'Recibido' ? 'active-label' : ''}">Recibido</span>
