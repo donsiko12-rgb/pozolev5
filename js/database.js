@@ -122,14 +122,17 @@ export async function loadUserOrders(uid) {
     try {
         const q = query(
             collection(db, "orders"), 
-            where("userId", "==", uid),
-            orderBy("createdAt", "desc")
+            where("userId", "==", uid)
         );
         const querySnapshot = await getDocs(q);
         let orders = [];
         querySnapshot.forEach((doc) => {
             orders.push({ id: doc.id, ...doc.data() });
         });
+        
+        // Ordenar localmente para evitar error de "Index Required" en Firestore
+        orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
         return orders;
     } catch (e) {
         console.error("Error loading user orders", e);
