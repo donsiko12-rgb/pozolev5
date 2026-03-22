@@ -21,23 +21,24 @@ const App = {
         console.log("App Initializing...");
         
         // Listen to Auth State Changes
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 // User is signed in.
-                DBLogic.getUserRole(user.uid).then(role => {
-                    state.user = user;
-                    state.role = role || 'client';
-                    
-                    // Setup UI for logged in user
-                    this.setupAuthenticatedUI();
-                    
-                    // Navigate to default view based on role
-                    if(state.role === 'admin') {
-                        this.navigate('admin-orders');
-                    } else {
-                        this.navigate('menu');
-                    }
-                });
+                const role = await DBLogic.getUserRole(user.uid);
+                const profile = await DBLogic.getUserProfile(user.uid);
+                state.user = user;
+                state.role = role || 'client';
+                state.userProfile = profile;
+                
+                // Setup UI for logged in user
+                this.setupAuthenticatedUI();
+                
+                // Navigate to default view based on role
+                if(state.role === 'admin') {
+                    this.navigate('admin-orders');
+                } else {
+                    this.navigate('menu');
+                }
             } else {
                 // User is signed out.
                 state.user = null;
