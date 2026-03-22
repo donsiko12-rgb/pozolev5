@@ -1,5 +1,5 @@
 import { addToCart, removeFromCart } from './cart.js';
-import { toggleProductStatus, updateOrderStatus } from './database.js';
+import { toggleProductStatus, updateOrderStatus, deleteOrder } from './database.js';
 
 export function init() {
     window.uiState = {
@@ -213,20 +213,26 @@ export function renderAdminOrders(orders) {
             </div>
             <div class="order-items text-muted" style="border-left: 3px solid var(--color-primary); padding-left: 10px; margin-bottom: 10px;">
                 <strong>Cliente:</strong> ${o.customerParams?.name || 'N/A'}<br>
-                <strong>Tel:</strong> ${o.customerParams?.phone || 'N/A'}<br>
+                <strong>Tel:</strong> <a href="tel:${o.customerParams?.phone}" style="color:var(--color-primary); text-decoration:none;">${o.customerParams?.phone || 'N/A'}</a><br>
                 <strong>Dirección:</strong> ${o.deliveryParams?.address || 'N/A'}<br>
-                <strong>Indicaciones:</strong> ${o.deliveryParams?.details || 'N/A'}<br>
+                ${(o.deliveryParams?.lat && o.deliveryParams?.lng) ? 
+                    `<a href="https://www.google.com/maps/dir/?api=1&destination=${o.deliveryParams.lat},${o.deliveryParams.lng}" target="_blank" style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📍 Abrir Navegación (GPS)</a><br>` 
+                    : ''}
+                <strong>Indicaciones extras:</strong> ${o.deliveryParams?.details || 'N/A'}<br>
                 <strong>Pago:</strong> Efectivo ($${o.paymentParams?.cash}) - Cambio: $${o.paymentParams?.change}
             </div>
             <div class="order-items"><strong>Pedido:</strong><br>${itemsHtml}</div>
-            <div class="admin-action">
-                <label>Estado Actual:</label>
-                <select class="status-selector" data-id="${o.id}">
-                    <option value="Recibido" ${o.status === 'Recibido' ? 'selected' : ''}>Recibido</option>
-                    <option value="En Preparacion" ${o.status === 'En Preparacion' ? 'selected' : ''}>En Preparación</option>
-                    <option value="En Camino" ${o.status === 'En Camino' ? 'selected' : ''}>En Camino</option>
-                    <option value="Entregado" ${o.status === 'Entregado' ? 'selected' : ''}>Entregado</option>
-                </select>
+            <div class="admin-action" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label>Estado Actual:</label>
+                    <select class="status-selector" data-id="${o.id}">
+                        <option value="Recibido" ${o.status === 'Recibido' ? 'selected' : ''}>Recibido</option>
+                        <option value="En Preparacion" ${o.status === 'En Preparacion' ? 'selected' : ''}>En Preparación</option>
+                        <option value="En Camino" ${o.status === 'En Camino' ? 'selected' : ''}>En Camino</option>
+                        <option value="Entregado" ${o.status === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                    </select>
+                </div>
+                <button class="btn btn-delete-order" data-id="${o.id}" style="background:var(--color-danger); color:white; padding:8px 14px; border-radius:8px; border:none; cursor:pointer;" title="Eliminar Pedido">Borrar 🗑️</button>
             </div>
         `;
         list.appendChild(card);
@@ -235,6 +241,18 @@ export function renderAdminOrders(orders) {
             const newStatus = e.target.value;
             const success = await updateOrderStatus(o.id, newStatus);
             if(success) showToast("Estado de pedido actualizado");
+        });
+
+        card.querySelector('.btn-delete-order').addEventListener('click', async (e) => {
+            if(confirm("¿Estás seguro de que deseas eliminar este pedido permanentemente?")) {
+                const success = await deleteOrder(o.id);
+                if(success) {
+                    showToast("Pedido eliminado");
+                    window.app.navigate('admin-orders');
+                } else {
+                    showToast("Error al eliminar pedido");
+                }
+            }
         });
     });
 }

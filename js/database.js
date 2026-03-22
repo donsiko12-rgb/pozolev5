@@ -7,6 +7,7 @@ import {
     setDoc, 
     updateDoc, 
     addDoc, 
+    deleteDoc,
     query, 
     where, 
     orderBy 
@@ -176,6 +177,17 @@ export async function updateOrderStatus(orderId, newStatus) {
         return true;
     } catch (e) {
         console.error("Error updating order status", e);
+        return false;
+    }
+}
+
+// Delete Order (Admin)
+export async function deleteOrder(orderId) {
+    try {
+        await deleteDoc(doc(db, "orders", orderId));
+        return true;
+    } catch (e) {
+        console.error("Error deleting order", e);
         return false;
     }
 }
