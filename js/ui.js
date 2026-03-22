@@ -38,22 +38,24 @@ export function renderProducts(products, currentCart) {
         let tag = p.category;
         let title = p.name;
         let sub = p.desc;
+        let imgSrc = '';
 
-        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = "IMPOSIBLE COMERSE UN SOLO PLATO"; sub = "POZOL TOST"; }
-        else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; }
-        else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; }
-        else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; }
-        else if(p.name.includes("Pata")) { theme = 'theme-ochre'; tag = "CLÁSICA"; title = "TOSTADA DE PATA"; sub = "LA DELICIA DE PATA"; }
+        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = "IMPOSIBLE COMERSE UN SOLO PLATO"; sub = "POZOL TOST"; imgSrc = "pozole.png"; }
+        else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; imgSrc = "cocacola.png"; }
+        else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; imgSrc = "aguasabor.png"; }
+        else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; imgSrc = "tostadatinga.png"; }
+        else if(p.name.includes("Pata")) { theme = 'theme-ochre'; tag = "CLÁSICA"; title = "TOSTADA DE PATA"; sub = "LA DELICIA DE PATA"; imgSrc = "tostadapata.png"; }
 
         const card = document.createElement('div');
         card.className = `promo-card ${theme}`;
         card.innerHTML = `
-            <div>
+            <div class="promo-content">
                 <div class="promo-tag">${tag}</div>
                 <div class="promo-title">${title}</div>
-                <div class="promo-subtitle">${sub}</div>
-            </div>
-            <div class="promo-price-tag">$${Number(p.price).toFixed(2)}</div>
+            <div class="promo-subtitle">${sub}</div>
+        </div>
+        ${imgSrc ? `<img src="img/${imgSrc}" class="promo-img" alt="${title}">` : ''}
+        <div class="promo-price-tag">$${Number(p.price).toFixed(2)}</div>
         `;
         list.appendChild(card);
         

@@ -408,33 +408,57 @@ input:focus {
     align-self: flex-start;
 }
 
+.promo-content {
+    position: relative;
+    z-index: 2;
+    max-width: 65%;
+}
+
 .promo-title {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 800;
-    line-height: 1;
+    line-height: 1.05;
     text-transform: uppercase;
     font-family: 'Outfit', sans-serif;
     margin-bottom: 6px;
+    word-wrap: break-word;
 }
 
 .promo-subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     text-transform: uppercase;
     opacity: 0.95;
     line-height: 1.2;
 }
 
+.promo-img {
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    height: 140px;
+    object-fit: contain;
+    z-index: 1;
+    filter: drop-shadow(0 15px 15px rgba(0,0,0,0.4));
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.promo-card:hover .promo-img {
+    transform: scale(1.08) rotate(-3deg);
+}
+
 .promo-price-tag {
     position: absolute;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
+    right: auto;
     background: rgba(255,255,255,0.25);
     padding: 6px 14px;
     border-radius: 8px;
     font-weight: 800;
     font-size: 1.2rem;
     backdrop-filter: blur(4px);
+    z-index: 2;
 }
 
 /* Card Themes */
