@@ -77,7 +77,18 @@ export async function loadProducts() {
 // Load All Products for Admin
 export async function loadProductsAdmin() {
     try {
-        const querySnapshot = await getDocs(collection(db, "products"));
+        let querySnapshot = await getDocs(collection(db, "products"));
+        
+        if (querySnapshot.empty) {
+            try {
+                await seedProducts();
+                querySnapshot = await getDocs(collection(db, "products"));
+            } catch (e) {
+                console.warn("No se pudo sembrar en admin", e);
+                return getStaticProducts();
+            }
+        }
+        
         let products = [];
         querySnapshot.forEach((doc) => {
             products.push({ id: doc.id, ...doc.data() });
@@ -85,7 +96,7 @@ export async function loadProductsAdmin() {
         return products;
     } catch (e) {
         console.error("Error loading all products", e);
-        return [];
+        return getStaticProducts();
     }
 }
 
