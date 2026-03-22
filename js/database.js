@@ -40,16 +40,27 @@ export async function getUserProfile(uid) {
     }
 }
 
+// Helper to get static products
+function getStaticProducts() {
+    return [
+        { id: "p1", name: "Pozole Grande", price: 120, category: "Pozole", desc: "Porción de 1 litro con maciza o surtida.", active: true },
+        { id: "p2", name: "Pozole Chico", price: 90, category: "Pozole", desc: "Porción de 500ml, ideal para el antojo.", active: true },
+        { id: "p3", name: "Tostada de Tinga", price: 35, category: "Complementos", desc: "Crujiente y deliciosa. Este complemento no debe faltar.", active: true },
+        { id: "p4", name: "Tostada de Pata", price: 40, category: "Complementos", desc: "La de pata no puede faltar en tu carrito.", active: true },
+        { id: "p5", name: "Agua de Sabor", price: 30, category: "Bebidas", desc: "Si te sientes fit y no fat, a llevar. (Jamaica/Horchata)", active: true },
+        { id: "p6", name: "Refresco", price: 25, category: "Bebidas", desc: "No es pozole sin una rica Coca.", active: true }
+    ];
+}
+
 // Load Active Products
 export async function loadProducts() {
     try {
         const q = query(collection(db, "products"), where("active", "==", true));
         const querySnapshot = await getDocs(q);
         
-        // If empty, let's auto-seed the database for demonstration purposes
         if(querySnapshot.empty) {
-            await seedProducts();
-            return await loadProducts(); // reload after seeding
+            seedProducts().catch(e => console.warn("No se pudo sembrar"));
+            return getStaticProducts();
         }
         
         let products = [];
@@ -58,8 +69,8 @@ export async function loadProducts() {
         });
         return products;
     } catch (e) {
-        console.error("Error loading products", e);
-        return [];
+        console.error("Error loading products, using fallback", e);
+        return getStaticProducts();
     }
 }
 

@@ -372,39 +372,96 @@ input:focus {
     transform: scale(0.95);
 }
 
-/* Products List */
-.product-card {
-    background: var(--color-surface);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--shadow-sm);
-    border-left: 4px solid var(--color-primary);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Products List - Promo Grid */
+.promo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
 }
 
-.product-card:active {
+.promo-card {
+    border-radius: 4px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 180px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.promo-card:active {
     transform: scale(0.98);
 }
 
-.product-info h3 {
-    font-size: 1.1rem;
-    margin-bottom: 4px;
-}
-
-.product-price {
+.promo-tag {
+    display: inline-block;
+    border: 1px solid currentColor;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: var(--color-primary);
-    font-size: 1.1rem;
+    margin-bottom: 12px;
+    align-self: flex-start;
 }
 
-.product-desc {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    margin-top: 4px;
+.promo-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    font-family: 'Outfit', sans-serif;
+    margin-bottom: 6px;
+}
+
+.promo-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.95;
+    line-height: 1.2;
+}
+
+.promo-price-tag {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    backdrop-filter: blur(4px);
+}
+
+/* Card Themes */
+.theme-ochre { background-color: #D59836; color: #FFF; }
+.theme-red { background-color: #C12A22; color: #FFF; }
+.theme-black { background-color: #1B1B1B; color: #FFF; }
+.theme-cream { background-color: #F0E5D1; color: #C12A22; }
+
+/* Bottom Sheet Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.3s;
+}
+.modal-overlay.hidden { display: none; }
+
+.bottom-sheet {
+    background: var(--color-surface);
+    width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 30px 24px;
+    animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
 }
 
 /* Quantity Control */

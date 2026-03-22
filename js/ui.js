@@ -25,49 +25,73 @@ export function showToast(message) {
 export function renderProducts(products, currentCart) {
     const list = document.getElementById('product-list');
     list.innerHTML = '';
+    list.className = 'promo-grid';
     
     if(products.length === 0) {
+        list.className = '';
         list.innerHTML = '<div class="empty-state"><p>No hay productos disponibles por ahora.</p></div>';
         return;
     }
 
     products.forEach(p => {
-        const cartItem = currentCart.find(i => i.id === p.id);
-        const qty = cartItem ? cartItem.quantity : 0;
-        
+        let theme = 'theme-black';
+        let tag = p.category;
+        let title = p.name;
+        let sub = p.desc;
+
+        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = "IMPOSIBLE COMERSE UN SOLO PLATO"; sub = "POZOL TOST"; }
+        else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; }
+        else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; }
+        else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; }
+        else if(p.name.includes("Pata")) { theme = 'theme-ochre'; tag = "CLÁSICA"; title = "TOSTADA DE PATA"; sub = "LA DELICIA DE PATA"; }
+
         const card = document.createElement('div');
-        card.className = 'product-card';
+        card.className = `promo-card ${theme}`;
         card.innerHTML = `
-            <div class="product-info">
-                <h3>${p.name}</h3>
-                <p class="product-desc">${p.desc}</p>
-                <div class="product-price">$${Number(p.price).toFixed(2)}</div>
+            <div>
+                <div class="promo-tag">${tag}</div>
+                <div class="promo-title">${title}</div>
+                <div class="promo-subtitle">${sub}</div>
             </div>
-            <div class="qty-control">
-                <button class="btn-qty btn-minus" data-id="${p.id}">-</button>
-                <span class="qty-val" id="qty-${p.id}">${qty}</span>
-                <button class="btn-qty btn-plus" data-id="${p.id}">+</button>
-            </div>
+            <div class="promo-price-tag">$${Number(p.price).toFixed(2)}</div>
         `;
         list.appendChild(card);
         
-        // Bind events precisely for this item
-        const btnPlus = card.querySelector('.btn-plus');
-        const btnMinus = card.querySelector('.btn-minus');
-        
-        btnPlus.addEventListener('click', () => {
-             addToCart(p);
-             document.getElementById(`qty-${p.id}`).innerText = Number(document.getElementById(`qty-${p.id}`).innerText) + 1;
-        });
-        
-        btnMinus.addEventListener('click', () => {
-             const curr = Number(document.getElementById(`qty-${p.id}`).innerText);
-             if(curr > 0) {
-                 removeFromCart(p.id);
-                 document.getElementById(`qty-${p.id}`).innerText = curr - 1;
-             }
-        });
+        card.addEventListener('click', () => openQtyModal(p));
     });
+}
+
+function openQtyModal(product) {
+    const modal = document.getElementById('qty-modal');
+    const nameEl = document.getElementById('modal-product-name');
+    const priceEl = document.getElementById('modal-product-price');
+    const qtyValEl = document.getElementById('modal-qty-val');
+    const btnMinus = document.getElementById('modal-btn-minus');
+    const btnPlus = document.getElementById('modal-btn-plus');
+    const btnAdd = document.getElementById('modal-btn-add');
+
+    nameEl.textContent = product.name;
+    priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
+    
+    let qty = 1;
+    qtyValEl.textContent = qty;
+
+    const newBtnMinus = btnMinus.cloneNode(true);
+    const newBtnPlus = btnPlus.cloneNode(true);
+    const newBtnAdd = btnAdd.cloneNode(true);
+    btnMinus.parentNode.replaceChild(newBtnMinus, btnMinus);
+    btnPlus.parentNode.replaceChild(newBtnPlus, btnPlus);
+    btnAdd.parentNode.replaceChild(newBtnAdd, btnAdd);
+
+    newBtnMinus.addEventListener('click', () => { if(qty > 1) { qty--; qtyValEl.textContent = qty; } });
+    newBtnPlus.addEventListener('click', () => { qty++; qtyValEl.textContent = qty; });
+    newBtnAdd.addEventListener('click', () => {
+        for(let i=0; i<qty; i++) addToCart(product);
+        showToast(`${qty}x ${product.name} agregado(s)`);
+        modal.classList.add('hidden');
+    });
+
+    modal.classList.remove('hidden');
 }
 
 export function renderCart(cartItems) {

@@ -306,6 +306,25 @@
             </a>
         </nav>
         
+        <!-- Add to Cart Modal (Bottom Sheet) -->
+        <div id="qty-modal" class="modal-overlay hidden">
+            <div class="bottom-sheet">
+                <div class="sheet-header">
+                    <h3 id="modal-product-name">Producto</h3>
+                    <button class="btn-icon" onclick="document.getElementById('qty-modal').classList.add('hidden')" style="width:36px;height:36px;font-size:1rem;">✖</button>
+                </div>
+                <div class="sheet-body text-center" style="text-align: center;">
+                    <p id="modal-product-price" class="modal-price" style="font-size:1.2rem; font-weight:bold; color:var(--color-primary);">$0.00</p>
+                    <div class="qty-selector-large" style="display:flex; justify-content:center; align-items:center; gap:20px; margin:20px 0;">
+                        <button id="modal-btn-minus" class="btn-qty" style="width:50px;height:50px;font-size:1.5rem;">-</button>
+                        <span id="modal-qty-val" class="qty-val" style="font-size:1.8rem;font-weight:800;min-width:40px;">1</span>
+                        <button id="modal-btn-plus" class="btn-qty" style="width:50px;height:50px;font-size:1.5rem;">+</button>
+                    </div>
+                    <button id="modal-btn-add" class="btn btn-primary btn-block mt-4" style="margin-top:20px;">Agregar al Carrito</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- Toast Notification Container -->
         <div id="toast-container" class="toast-container"></div>
     </div>
