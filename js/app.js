@@ -49,6 +49,19 @@ const App = {
 
         // Setup Event Listeners
         this.bindEvents();
+
+        // Auto Refresh every 10 seconds
+        setInterval(() => {
+            const autoRefreshViews = ['menu', 'orders', 'admin-orders', 'admin-products'];
+            if (state.currentView && autoRefreshViews.includes(state.currentView)) {
+                // Prevent interrupting the admin if they are currently clicking a state Dropdown or interacting with an input
+                const activeEl = document.activeElement;
+                if(activeEl && (activeEl.tagName === 'SELECT' || activeEl.tagName === 'INPUT')) {
+                    return; 
+                }
+                this.runViewLogic(state.currentView);
+            }
+        }, 10000);
     },
 
     navigate(viewId) {
