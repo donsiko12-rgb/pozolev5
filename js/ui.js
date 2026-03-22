@@ -161,6 +161,7 @@ export function renderClientOrders(orders) {
     orders.forEach(o => {
         const date = new Date(o.createdAt).toLocaleString();
         let itemsHtml = o.items.map(i => `${i.quantity}x ${i.name}`).join('<br>');
+        let safeStatus = o.status.replace(/ /g, '');
         
         const card = document.createElement('div');
         card.className = 'order-card';
@@ -169,10 +170,24 @@ export function renderClientOrders(orders) {
                 <span class="order-id">#${o.id.substring(0,6).toUpperCase()}</span>
                 <span class="order-date">${date}</span>
             </div>
-            <div class="order-items text-muted">${itemsHtml}</div>
-            <div class="order-footer">
+            <div class="order-items text-muted" style="margin-bottom:10px;">${itemsHtml}</div>
+            <div class="order-footer" style="margin-bottom:5px;">
                 <span class="order-total">$${Number(o.total).toFixed(2)}</span>
-                <span class="badge status-${o.status.replace(/ /g, '')}">${o.status}</span>
+                <span class="order-date" style="font-weight:bold; color:var(--color-dark);">Total</span>
+            </div>
+            <div class="order-status-tracker">
+                <div class="tracker-img-container">
+                    <img src="img/status.png" class="status-img pos-${safeStatus}" alt="${o.status}">
+                </div>
+                <div class="tracker-bar">
+                    <div class="tracker-progress prog-${safeStatus}"></div>
+                </div>
+                <div class="tracker-labels">
+                    <span class="${safeStatus === 'Recibido' ? 'active-label' : ''}">Recibido</span>
+                    <span class="${safeStatus === 'EnPreparacion' ? 'active-label' : ''}">Preparando</span>
+                    <span class="${safeStatus === 'EnCamino' ? 'active-label' : ''}">En Camino</span>
+                    <span class="${safeStatus === 'Entregado' ? 'active-label' : ''}">Entregado</span>
+                </div>
             </div>
         `;
         list.appendChild(card);

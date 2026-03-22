@@ -908,3 +908,83 @@ input:checked + .slider:before {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* Order Status Tracker */
+.order-status-tracker {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--color-border);
+    position: relative;
+    padding-bottom: 25px;
+}
+
+.tracker-img-container {
+    position: relative;
+    height: 48px;
+    margin-bottom: 8px;
+}
+
+.status-img {
+    height: 48px;
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: floating 2.5s ease-in-out infinite;
+    z-index: 2;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.15));
+}
+
+@keyframes floating {
+    0% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -8px) rotate(-3deg); }
+    100% { transform: translate(-50%, 0); }
+}
+
+/* Status Positions */
+.status-img.pos-Recibido { left: 10%; }
+.status-img.pos-EnPreparacion { left: 38%; }
+.status-img.pos-EnCamino { left: 63%; }
+.status-img.pos-Entregado { left: 90%; }
+
+.tracker-bar {
+    background: #EAEAEA;
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tracker-progress {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--color-primary);
+    transition: width 0.8s ease-out;
+}
+
+.tracker-progress.prog-Recibido { width: 10%; }
+.tracker-progress.prog-EnPreparacion { width: 38%; }
+.tracker-progress.prog-EnCamino { width: 63%; }
+.tracker-progress.prog-Entregado { width: 100%; }
+
+.tracker-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #A0A0A0;
+    margin-top: 12px;
+    position: absolute;
+    left: 0; right: 0;
+}
+
+.tracker-labels span {
+    flex: 1;
+    text-align: center;
+    transition: color 0.3s;
+}
+
+.tracker-labels span.active-label {
+    color: var(--color-primary);
+    font-weight: 800;
+}
