@@ -37,6 +37,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.hidden {
+    display: none !important;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--color-bg);
