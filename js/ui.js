@@ -1,4 +1,4 @@
-import { addToCart, removeFromCart } from './cart.js';
+import { addToCart, removeFromCart, getCart } from './cart.js';
 import { toggleProductStatus, updateOrderStatus, deleteOrder } from './database.js';
 
 export function init() {
@@ -136,7 +136,7 @@ export function renderCart(cartItems) {
         div.querySelector('.btn-icon').addEventListener('click', () => {
             // Remove completely
             for(let i=0; i<item.quantity; i++) removeFromCart(item.id);
-            renderCart(import('./cart.js').then(m => m.getCart())); // dirty reload
+            renderCart(getCart()); // proper synchronous reload
             window.app.navigate('cart'); 
         });
     });
