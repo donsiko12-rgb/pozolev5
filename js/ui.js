@@ -290,8 +290,9 @@ export function renderAdminProducts(products) {
         list.appendChild(card);
         
         card.querySelector('.product-toggle').addEventListener('change', async (e) => {
-            const success = await toggleProductStatus(p.id, !p.active);
+            const success = await toggleProductStatus(p.id, p.active);
             if(success) {
+                p.active = !p.active; // update local struct for continuous toggling
                 showToast(`Producto ${e.target.checked ? 'Activado' : 'Desactivado'}`);
             } else {
                 e.target.checked = !e.target.checked; // Revert if failed

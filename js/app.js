@@ -163,6 +163,14 @@ const App = {
             });
         });
 
+        // Header Cart Button binding
+        const headerCartBtn = document.getElementById('cart-badge-container');
+        if(headerCartBtn) {
+            headerCartBtn.addEventListener('click', () => {
+                this.navigate('cart');
+            });
+        }
+
         // Global Checkout Flow bindings mapping
         document.getElementById('btn-continue-checkout').addEventListener('click', () => {
             if(CartLogic.getCart().length === 0) {

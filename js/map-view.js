@@ -49,6 +49,12 @@ export function initMap(containerId) {
             map.setView([currentPos.lat, currentPos.lng], 16);
             marker.setLatLng(currentPos);
             updateAddressFromCoords(currentPos.lat, currentPos.lng);
+        }, (error) => {
+            console.warn("GPS Init Error", error);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
         });
     }
 
@@ -86,6 +92,10 @@ function bindCheckoutEvents() {
                 showToast("Ubicación actualizada");
             }, () => {
                 showToast("No se pudo obtener la ubicación GPS");
+            }, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
             });
         }
     });
