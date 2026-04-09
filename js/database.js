@@ -10,7 +10,8 @@ import {
     deleteDoc,
     query, 
     where, 
-    orderBy 
+    orderBy,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // Fetch User Role
@@ -24,6 +25,39 @@ export async function getUserRole(uid) {
     } catch (e) {
         console.error("Error getting user role", e);
         return 'client';
+    }
+}
+
+// Listen Store Status
+export function listenStoreStatus(callback) {
+    const unsub = onSnapshot(doc(db, "settings", "store"), (docSnap) => {
+        if(docSnap.exists()) {
+            callback(docSnap.data().isOpen);
+        } else {
+            // Default to open
+            callback(true);
+            setDoc(doc(db, "settings", "store"), { isOpen: true }).catch(()=>{});
+        }
+    });
+    return unsub;
+}
+
+// Toggle Store Status (Admin)
+export async function toggleStoreStatus(currentStatus) {
+    try {
+        await updateDoc(doc(db, "settings", "store"), {
+            isOpen: !currentStatus
+        });
+        return true;
+    } catch(e) {
+        console.error("Error toggling store", e);
+        // fallback setDoc in case setting doesn't exist
+        try {
+            await setDoc(doc(db, "settings", "store"), { isOpen: !currentStatus });
+            return true;
+        } catch(err) {
+            return false;
+        }
     }
 }
 

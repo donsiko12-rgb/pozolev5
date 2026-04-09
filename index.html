@@ -31,6 +31,13 @@
                 <span class="icon-cart">🛒</span>
                 <span id="cart-count" class="cart-count">0</span>
             </div>
+            <div id="admin-store-toggle-container" class="hidden" style="display:flex; align-items:center; gap:8px;">
+                <span class="badge" id="admin-store-status-badge" style="background:#dc3545; color:white;">CERRADA</span>
+                <label class="switch" style="padding:0; margin:0; background:transparent;">
+                    <input type="checkbox" id="admin-toggle-store">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </header>
 
         <!-- Main Content Area -->
@@ -138,19 +145,37 @@
                 <!-- Step 1: Location -->
                 <div id="checkout-step-1" class="checkout-step active">
                     <div class="view-header">
-                        <h2>Ubicación de Entrega</h2>
-                        <p class="subtitle">Confirma dónde entregaremos</p>
+                        <h2>Detalles de Entrega</h2>
+                        <p class="subtitle">Elige cómo recibir tu pedido</p>
                     </div>
                     
-                    <div class="map-container">
-                        <div id="delivery-map"></div>
-                        <button id="btn-gps" class="btn-icon gps-button" title="Usar mi ubicación actual">📍</button>
+                    <div class="delivery-options text-center" style="margin-bottom:20px; display:flex; gap:10px;">
+                        <button id="btn-opt-delivery" class="btn btn-outline active" style="flex:1; border-color:var(--color-primary); color:var(--color-primary);">A Domicilio</button>
+                        <button id="btn-opt-pickup" class="btn btn-outline" style="flex:1;">Pasar a Recoger</button>
                     </div>
-                    <p class="map-hint">Puedes mover el mapa para ajustar la ubicación exacta.</p>
                     
-                    <div class="input-group">
-                        <label for="delivery-address-details">Detalles de dirección (Interior, referencias)</label>
-                        <input type="text" id="delivery-address-details" placeholder="Ej. Casa roja rejas negras">
+                    <div id="delivery-fields">
+                        <div class="map-container">
+                            <div id="delivery-map"></div>
+                            <button id="btn-gps" class="btn-icon gps-button" title="Usar mi ubicación actual">📍</button>
+                        </div>
+                        <p class="map-hint">Puedes mover el mapa para ajustar la ubicación exacta.</p>
+                        
+                        <div class="input-group">
+                            <label for="delivery-address-details">Detalles de dirección (Interior, referencias)</label>
+                            <input type="text" id="delivery-address-details" placeholder="Ej. Casa roja rejas negras">
+                        </div>
+                    </div>
+
+                    <div id="pickup-fields" class="hidden">
+                        <div class="input-group">
+                            <label for="pickup-time">¿A qué hora pasas por el pedido?</label>
+                            <input type="time" id="pickup-time" min="14:00" max="22:00" style="padding:14px; font-size:1.2rem; text-align:center;">
+                        </div>
+                        <p class="text-muted" style="text-align:center; margin-top:20px; margin-bottom: 20px;">
+                            <strong>Nuestra dirección:</strong><br>
+                            Visítanos en el local de Pozole Express para recoger tu pedido calentito.
+                        </p>
                     </div>
 
                     <div class="checkout-actions">
@@ -322,6 +347,16 @@
                     </div>
                     <button id="modal-btn-add" class="btn btn-primary btn-block mt-4" style="margin-top:20px;">Agregar al Carrito</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Store Closed Overlay -->
+        <div id="store-closed-overlay" class="modal-overlay hidden" style="backdrop-filter: blur(5px); z-index: 2000; justify-content:center; align-items:center;">
+            <div class="card" style="text-align: center; max-width: 400px; padding: 40px 20px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <div style="font-size: 4rem; margin-bottom: 5px;">🔒</div>
+                <h2 style="font-size: 2rem; color:var(--color-primary);">Cerrado</h2>
+                <p class="text-muted mt-4" style="font-size: 1.1rem; line-height: 1.5; margin-top:15px;">Lo sentimos, abrimos a las 2 PM y cerramos a las 10 PM.</p>
+                <button class="btn btn-primary btn-block mt-4" style="margin-top: 20px;" onclick="document.getElementById('store-closed-overlay').classList.add('hidden');">Entendido</button>
             </div>
         </div>
         

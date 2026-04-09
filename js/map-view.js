@@ -8,10 +8,11 @@ let marker = null;
 let currentPos = { lat: 19.4326, lng: -99.1332 }; // default CDMX
 let initialized = false;
 let isProcessingOrder = false;
+let orderType = 'delivery'; // 'delivery' or 'pickup'
 
 // Delivery Params
 const orderParams = {
-    delivery: { lat: 0, lng: 0, address: '', details: '' },
+    delivery: { type: 'delivery', pickupTime: '', lat: 0, lng: 0, address: '', details: '' },
     payment: { cash: 0, change: 0 }
 };
 
@@ -100,15 +101,60 @@ function bindCheckoutEvents() {
         }
     });
 
+    // Option toggles
+    document.getElementById('btn-opt-delivery').addEventListener('click', (e) => {
+        orderType = 'delivery';
+        e.target.classList.add('active');
+        e.target.style.borderColor = 'var(--color-primary)';
+        e.target.style.color = 'var(--color-primary)';
+        
+        const pickupBtn = document.getElementById('btn-opt-pickup');
+        pickupBtn.classList.remove('active');
+        pickupBtn.style.borderColor = '';
+        pickupBtn.style.color = '';
+        
+        document.getElementById('delivery-fields').classList.remove('hidden');
+        document.getElementById('pickup-fields').classList.add('hidden');
+        setTimeout(() => invalidateSize(), 100);
+    });
+
+    document.getElementById('btn-opt-pickup').addEventListener('click', (e) => {
+        orderType = 'pickup';
+        e.target.classList.add('active');
+        e.target.style.borderColor = 'var(--color-primary)';
+        e.target.style.color = 'var(--color-primary)';
+        
+        const deliveryBtn = document.getElementById('btn-opt-delivery');
+        deliveryBtn.classList.remove('active');
+        deliveryBtn.style.borderColor = '';
+        deliveryBtn.style.color = '';
+        
+        document.getElementById('delivery-fields').classList.add('hidden');
+        document.getElementById('pickup-fields').classList.remove('hidden');
+    });
+
     // Step 1 -> Step 2
     document.getElementById('btn-checkout-next-1').addEventListener('click', () => {
-        const details = document.getElementById('delivery-address-details').value;
-        orderParams.delivery.lat = currentPos.lat;
-        orderParams.delivery.lng = currentPos.lng;
-        orderParams.delivery.details = details;
-        
-        if(!orderParams.delivery.address) {
-             orderParams.delivery.address = "Ubicación en GPS ("+currentPos.lat.toFixed(4)+","+currentPos.lng.toFixed(4)+")";
+        if(orderType === 'delivery') {
+            const details = document.getElementById('delivery-address-details').value;
+            orderParams.delivery.type = 'delivery';
+            orderParams.delivery.lat = currentPos.lat;
+            orderParams.delivery.lng = currentPos.lng;
+            orderParams.delivery.details = details;
+            
+            if(!orderParams.delivery.address) {
+                 orderParams.delivery.address = "Ubicación en GPS ("+currentPos.lat.toFixed(4)+","+currentPos.lng.toFixed(4)+")";
+            }
+        } else {
+            const time = document.getElementById('pickup-time').value;
+            if(!time) {
+                showToast("Por favor, selecciona a qué hora pasarás por tu pedido");
+                return;
+            }
+            orderParams.delivery.type = 'pickup';
+            orderParams.delivery.pickupTime = time;
+            orderParams.delivery.address = "Pasar a Recoger";
+            orderParams.delivery.details = '';
         }
 
         const total = getCartTotal();
@@ -217,9 +263,14 @@ function populateSummary() {
     });
 
     // Delivery
-    let addrHtml = `<strong>${orderParams.delivery.address}</strong>`;
-    if(orderParams.delivery.details) {
-        addrHtml += `<br><small class="text-muted">Ref: ${orderParams.delivery.details}</small>`;
+    let addrHtml = '';
+    if(orderParams.delivery.type === 'pickup') {
+        addrHtml = `<strong>🛍️ Pasar a Recoger</strong><br>Hora: ${orderParams.delivery.pickupTime}`;
+    } else {
+        addrHtml = `<strong>🏍️ A Domicilio:</strong><br>${orderParams.delivery.address}`;
+        if(orderParams.delivery.details) {
+            addrHtml += `<br><small class="text-muted">Ref: ${orderParams.delivery.details}</small>`;
+        }
     }
     document.getElementById('checkout-summary-address').innerHTML = addrHtml;
 

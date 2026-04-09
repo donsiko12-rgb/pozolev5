@@ -12,7 +12,8 @@ const state = {
     role: 'client', // client, admin
     currentView: 'loading',
     products: [],
-    orders: []
+    orders: [],
+    storeOpen: true
 };
 
 // Application Router / View Manager
@@ -45,6 +46,33 @@ const App = {
                 state.role = null;
                 this.setupUnauthenticatedUI();
                 this.navigate('auth');
+            }
+        });
+
+        // Listen to Store Status
+        DBLogic.listenStoreStatus((isOpen) => {
+            state.storeOpen = isOpen;
+            
+            const overlay = document.getElementById('store-closed-overlay');
+            if(overlay) {
+                if(!isOpen && state.role !== 'admin') {
+                    overlay.classList.remove('hidden');
+                    // auto boot checkout flow
+                    if(state.currentView === 'checkout') {
+                        this.navigate('cart');
+                    }
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+
+            // Sync Admin Toggle
+            const adminBadge = document.getElementById('admin-store-status-badge');
+            const adminSwitch = document.getElementById('admin-toggle-store');
+            if(adminBadge && adminSwitch) {
+                adminBadge.textContent = isOpen ? 'ABIERTA' : 'CERRADA';
+                adminBadge.style.background = isOpen ? '#28a745' : '#dc3545';
+                adminSwitch.checked = isOpen;
             }
         });
 
@@ -173,6 +201,11 @@ const App = {
 
         // Global Checkout Flow bindings mapping
         document.getElementById('btn-continue-checkout').addEventListener('click', () => {
+            if(!state.storeOpen && state.role !== 'admin') {
+                UILogic.showToast("Lo sentimos, la tienda está cerrada ahora.");
+                return;
+            }
+
             if(CartLogic.getCart().length === 0) {
                 UILogic.showToast("El carrito está vacío");
                 return;
@@ -180,6 +213,21 @@ const App = {
             this.navigate('checkout');
             UILogic.showCheckoutStep(1);
         });
+
+        // Store Admin Toggle binding
+        const storeToggle = document.getElementById('admin-toggle-store');
+        if(storeToggle) {
+            storeToggle.addEventListener('change', async (e) => {
+                const targetState = e.target.checked;
+                e.target.disabled = true;
+                const success = await DBLogic.toggleStoreStatus(state.storeOpen);
+                if(!success) {
+                    e.target.checked = state.storeOpen;
+                    UILogic.showToast("Error al cambiar estado de la tienda");
+                }
+                e.target.disabled = false;
+            });
+        }
 
         // We will expose navigate to window for inline onclicks in generated HTML
         window.app = {
