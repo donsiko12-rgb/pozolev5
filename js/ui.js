@@ -231,7 +231,14 @@ export function renderAdminOrders(orders) {
                     `<strong>🛍️ Recolección:</strong> ${o.deliveryParams.pickupTime}` : 
                     `<strong>🏍️ Domicilio:</strong> ${o.deliveryParams?.address || 'N/A'}<br>
                      ${(o.deliveryParams?.lat && o.deliveryParams?.lng) ? 
-                        `<a href="https://www.google.com/maps/dir/?api=1&destination=${o.deliveryParams.lat},${o.deliveryParams.lng}" target="_blank" style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📍 Abrir Navegación (GPS)</a><br>` 
+                        `<a href="#" onclick="
+                            const iframe = document.createElement('iframe');
+                            iframe.style.display = 'none';
+                            iframe.src = 'geo:0,0?q=${o.deliveryParams.lat},${o.deliveryParams.lng}(${encodeURIComponent('Entrega')})';
+                            document.body.appendChild(iframe);
+                            setTimeout(() => document.body.removeChild(iframe), 1500);
+                            return false;
+                        " style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📍 Abrir Mapa (Nativo) sin cerrar app</a><br>`
                         : ''}
                      <strong>Indicaciones extras:</strong> ${o.deliveryParams?.details || 'N/A'}
                     `
