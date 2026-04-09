@@ -164,14 +164,18 @@ const App = {
     setupAuthenticatedUI() {
         document.getElementById('main-header').classList.remove('hidden');
         
+        const adminToggle = document.getElementById('admin-store-toggle-container');
+
         if (state.role === 'admin') {
             document.getElementById('bottom-nav').classList.add('hidden');
             document.getElementById('admin-bottom-nav').classList.remove('hidden');
             document.getElementById('cart-badge-container').classList.add('hidden');
+            if(adminToggle) adminToggle.classList.remove('hidden');
         } else {
             document.getElementById('bottom-nav').classList.remove('hidden');
             document.getElementById('admin-bottom-nav').classList.add('hidden');
             document.getElementById('cart-badge-container').classList.remove('hidden');
+            if(adminToggle) adminToggle.classList.add('hidden');
         }
     },
 
