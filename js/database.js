@@ -59,19 +59,14 @@ export async function loadProducts() {
         const q = query(collection(db, "products"), where("active", "==", true));
         const querySnapshot = await getDocs(q);
         
-        if(querySnapshot.empty) {
-            seedProducts().catch(e => console.warn("No se pudo sembrar"));
-            return getStaticProducts();
-        }
-        
         let products = [];
         querySnapshot.forEach((doc) => {
             products.push({ id: doc.id, ...doc.data() });
         });
         return products;
     } catch (e) {
-        console.error("Error loading products, using fallback", e);
-        return getStaticProducts();
+        console.error("Error loading products", e);
+        return [];
     }
 }
 
