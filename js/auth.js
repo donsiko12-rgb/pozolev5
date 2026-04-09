@@ -58,7 +58,13 @@ export function init() {
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
             const name = document.getElementById('reg-name').value;
-            const address = document.getElementById('reg-address').value;
+            
+            const street = document.getElementById('reg-street').value;
+            const number = document.getElementById('reg-number').value;
+            const zip = document.getElementById('reg-zip').value;
+            const neighborhood = document.getElementById('reg-neighborhood').value;
+            const address = `${street} #${number}, Col. ${neighborhood}, C.P. ${zip}`;
+            
             const phone = document.getElementById('reg-phone').value;
             const errorEl = document.getElementById('reg-error');
             
@@ -73,6 +79,10 @@ export function init() {
                 await setDoc(doc(db, "users", user.uid), {
                     name,
                     address,
+                    street,
+                    number,
+                    neighborhood,
+                    zip,
                     phone,
                     email,
                     role: "client",
