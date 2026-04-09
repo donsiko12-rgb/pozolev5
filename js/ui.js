@@ -231,14 +231,9 @@ export function renderAdminOrders(orders) {
                     `<strong>🛍️ Recolección:</strong> ${o.deliveryParams.pickupTime}` : 
                     `<strong>🏍️ Domicilio:</strong> ${o.deliveryParams?.address || 'N/A'}<br>
                      ${(o.deliveryParams?.lat && o.deliveryParams?.lng) ? 
-                        `<a href="#" onclick="
-                            const iframe = document.createElement('iframe');
-                            iframe.style.display = 'none';
-                            iframe.src = 'geo:0,0?q=${o.deliveryParams.lat},${o.deliveryParams.lng}(${encodeURIComponent('Entrega')})';
-                            document.body.appendChild(iframe);
-                            setTimeout(() => document.body.removeChild(iframe), 1500);
-                            return false;
-                        " style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📍 Abrir Mapa (Nativo) sin cerrar app</a><br>`
+                        `<a href="#" onclick="window.open('geo:${o.deliveryParams.lat},${o.deliveryParams.lng}?q=${o.deliveryParams.lat},${o.deliveryParams.lng}', '_system'); return false;" style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📍 Abrir Mapa (Nativo)</a><br>
+                         <a href="#" onclick="navigator.clipboard.writeText('${o.deliveryParams.lat}, ${o.deliveryParams.lng}').then(() => alert('¡Coordenadas copiadas al portapapeles! Toma Waze o Google Maps y pegalas.')).catch(() => alert('Error al copiar')); return false;" style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">📋 Copiar Coordenadas GPS</a><br>
+                         <a href="https://www.google.com/maps/dir/?api=1&destination=${o.deliveryParams.lat},${o.deliveryParams.lng}" target="_blank" style="display:inline-block; margin-top:4px; margin-bottom:4px; font-weight:bold; color:#1a73e8; text-decoration:none;">🌐 Ver en Explorador Web</a><br>` 
                         : ''}
                      <strong>Indicaciones extras:</strong> ${o.deliveryParams?.details || 'N/A'}
                     `
