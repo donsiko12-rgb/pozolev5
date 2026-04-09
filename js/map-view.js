@@ -151,6 +151,16 @@ function bindCheckoutEvents() {
                 showToast("Por favor, selecciona a qué hora pasarás por tu pedido");
                 return;
             }
+            
+            // Validate time between 14:00 and 22:00
+            const timeParts = time.split(':');
+            const hours = parseInt(timeParts[0], 10);
+            const mins = parseInt(timeParts[1], 10);
+            if (hours < 14 || hours > 22 || (hours === 22 && mins > 0)) {
+                showToast("El horario de recolección es de 14:00 a 22:00 hrs, intenta de nuevo.");
+                return;
+            }
+
             orderParams.delivery.type = 'pickup';
             orderParams.delivery.pickupTime = time;
             orderParams.delivery.address = "Pasar a Recoger";
