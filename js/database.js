@@ -94,8 +94,14 @@ export async function loadProducts() {
         const querySnapshot = await getDocs(q);
         
         let products = [];
+        let seenNames = new Set();
+        
         querySnapshot.forEach((doc) => {
-            products.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            if(!seenNames.has(data.name)) {
+                seenNames.add(data.name);
+                products.push({ id: doc.id, ...data });
+            }
         });
         return products;
     } catch (e) {
@@ -107,22 +113,28 @@ export async function loadProducts() {
 // Load All Products for Admin
 export async function loadProductsAdmin() {
     try {
-        let querySnapshot = await getDocs(collection(db, "products"));
-        
-        if (querySnapshot.empty) {
-            try {
-                await seedProducts();
-                querySnapshot = await getDocs(collection(db, "products"));
-            } catch (e) {
-                console.warn("No se pudo sembrar en admin", e);
-                return getStaticProducts();
-            }
-        }
+        const querySnapshot = await getDocs(collection(db, "products"));
         
         let products = [];
+        let seenNames = new Set();
+        let duplicatesToDelete = [];
+        
         querySnapshot.forEach((doc) => {
-            products.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            if(seenNames.has(data.name)) {
+                duplicatesToDelete.push(doc.id);
+            } else {
+                seenNames.add(data.name);
+                products.push({ id: doc.id, ...data });
+            }
         });
+        
+        // Auto-purge redundant duplication in Firebase from bugs
+        if (duplicatesToDelete.length > 0) {
+            console.warn("Purging duplicated products from Firebase:", duplicatesToDelete);
+            duplicatesToDelete.forEach(id => deleteDoc(doc(db, "products", id)).catch(()=>{}));
+        }
+        
         return products;
     } catch (e) {
         console.error("Error loading all products", e);
@@ -221,19 +233,4 @@ export async function deleteOrder(orderId) {
     }
 }
 
-// Helper to seed initial products if DB is empty
-async function seedProducts() {
-    console.log("Seeding products...");
-    const initialProducts = [
-        { name: "Pozole Grande", price: 120, category: "Pozole", desc: "Porción de 1 litro con maciza o surtida.", active: true },
-        { name: "Pozole Chico", price: 90, category: "Pozole", desc: "Porción de 500ml, ideal para el antojo.", active: true },
-        { name: "Tostada de Tinga", price: 35, category: "Complementos", desc: "Crujiente y deliciosa. Este complemento no debe faltar.", active: true },
-        { name: "Tostada de Pata", price: 40, category: "Complementos", desc: "La de pata no puede faltar en tu carrito.", active: true },
-        { name: "Agua de Sabor", price: 30, category: "Bebidas", desc: "Si te sientes fit y no fat, a llevar. (Jamaica/Horchata)", active: true },
-        { name: "Refresco", price: 25, category: "Bebidas", desc: "No es pozole sin una rica Coca.", active: true }
-    ];
-    
-    for (const p of initialProducts) {
-        await addDoc(collection(db, "products"), p);
-    }
-}
+// Seeds removed to prevent production DB pollution
