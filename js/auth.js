@@ -31,6 +31,60 @@ export function init() {
         });
     }
 
+    // Zip Code Smart API Integration
+    const zipInput = document.getElementById('reg-zip');
+    if (zipInput) {
+        zipInput.addEventListener('input', async (e) => {
+            const zipCode = e.target.value.trim();
+            let neighborhoodInput = document.getElementById('reg-neighborhood');
+
+            if (zipCode.length === 5) {
+                // Keep it as a select object
+                if (neighborhoodInput.tagName.toLowerCase() === 'input') {
+                    const newSelect = document.createElement('select');
+                    newSelect.id = 'reg-neighborhood';
+                    newSelect.required = true;
+                    newSelect.style.cssText = neighborhoodInput.style.cssText;
+                    neighborhoodInput.parentNode.replaceChild(newSelect, neighborhoodInput);
+                    neighborhoodInput = newSelect;
+                }
+
+                neighborhoodInput.innerHTML = '<option value="">Buscando colonias...</option>';
+                neighborhoodInput.disabled = true;
+                
+                try {
+                    const response = await fetch(`https://api.zippopotam.us/mx/${zipCode}`);
+                    if (!response.ok) throw new Error("No encontrado");
+                    const data = await response.json();
+                    
+                    neighborhoodInput.innerHTML = '<option value="">Selecciona tu colonia</option>';
+                    data.places.forEach(place => {
+                        const option = document.createElement('option');
+                        option.value = place["place name"];
+                        option.textContent = place["place name"];
+                        neighborhoodInput.appendChild(option);
+                    });
+                    neighborhoodInput.disabled = false;
+                } catch (error) {
+                    // Fallback to purely free text box if Internet/API fails or ZIP not found
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = 'reg-neighborhood';
+                    input.required = true;
+                    input.placeholder = 'No se encontró (escribe abajo):';
+                    input.style.cssText = "width:100%; padding: 14px 16px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 1rem; background-color: #FAFAFA;";
+                    neighborhoodInput.parentNode.replaceChild(input, neighborhoodInput);
+                }
+            } else if (zipCode.length < 5) {
+                // If they delete digits, revert to a disabled safe-guard
+                if (neighborhoodInput.tagName.toLowerCase() === 'select') {
+                    neighborhoodInput.innerHTML = '<option value="">Primero ingresa C.P. a 5 dígitos</option>';
+                    neighborhoodInput.disabled = true;
+                }
+            }
+        });
+    }
+
     // Login Form Submit
     if(formLogin) {
         formLogin.addEventListener('submit', async (e) => {
