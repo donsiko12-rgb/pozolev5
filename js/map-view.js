@@ -167,7 +167,7 @@ function bindCheckoutEvents() {
             orderParams.delivery.details = '';
         }
 
-        const total = getCartTotal();
+        const total = getCartTotal() + (orderParams.delivery.type === 'delivery' ? 30 : 0);
         document.getElementById('checkout-total-display').textContent = `$${Number(total).toFixed(2)}`;
         
         showCheckoutStep(2);
@@ -183,7 +183,7 @@ function bindCheckoutEvents() {
     const changeHint = document.getElementById('payment-change-hint');
     
     cashInput.addEventListener('input', (e) => {
-        const total = getCartTotal();
+        const total = getCartTotal() + (orderParams.delivery.type === 'delivery' ? 30 : 0);
         const cashValue = parseFloat(e.target.value);
         if(!isNaN(cashValue) && cashValue >= total) {
             changeHint.textContent = `Su cambio será de $${Number(cashValue - total).toFixed(2)}`;
@@ -196,7 +196,7 @@ function bindCheckoutEvents() {
 
     // Step 2 -> Step 3
     document.getElementById('btn-checkout-next-2').addEventListener('click', () => {
-        const total = getCartTotal();
+        const total = getCartTotal() + (orderParams.delivery.type === 'delivery' ? 30 : 0);
         const cash = parseFloat(document.getElementById('payment-cash').value);
         
         if(isNaN(cash) || cash < total) {
@@ -233,7 +233,7 @@ function bindCheckoutEvents() {
                 phone: state.userProfile?.phone || 'S/N',
             },
             items: cartItems,
-            total: getCartTotal(),
+            total: getCartTotal() + (orderParams.delivery.type === 'delivery' ? 30 : 0),
             deliveryParams: orderParams.delivery,
             paymentParams: orderParams.payment
         };
@@ -284,8 +284,15 @@ function populateSummary() {
     }
     document.getElementById('checkout-summary-address').innerHTML = addrHtml;
 
+    // Envio Row
+    if(orderParams.delivery.type === 'delivery') {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>Costo de Envío 🛵</span> <span>$30.00</span>`;
+        summaryItems.appendChild(li);
+    }
+
     // Payment
     document.getElementById('checkout-summary-cash').textContent = `$${Number(orderParams.payment.cash).toFixed(2)}`;
     document.getElementById('checkout-summary-change').textContent = `$${Number(orderParams.payment.change).toFixed(2)}`;
-    document.getElementById('checkout-summary-total').textContent = `$${Number(getCartTotal()).toFixed(2)}`;
+    document.getElementById('checkout-summary-total').textContent = `$${Number(getCartTotal() + (orderParams.delivery.type === 'delivery' ? 30 : 0)).toFixed(2)}`;
 }
