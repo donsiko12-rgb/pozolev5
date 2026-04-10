@@ -280,7 +280,7 @@ export function renderAdminProducts(products) {
     
     products.forEach(p => {
         const card = document.createElement('div');
-        card.className = 'product-card';
+        card.className = 'admin-item';
         card.innerHTML = `
             <div class="product-info">
                 <h3>${p.name}</h3>
