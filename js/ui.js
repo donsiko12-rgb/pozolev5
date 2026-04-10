@@ -249,46 +249,55 @@ export function renderAdminOrders(orders) {
                         <option value="Entregado" ${o.status === 'Entregado' ? 'selected' : ''}>Entregado</option>
                     </select>
                 </div>
-                <button class="btn btn-delete-order" data-id="${o.id}" style="background:var(--color-danger); color:white; padding:8px 14px; border-radius:8px; border:none; cursor:pointer;" title="Eliminar Pedido">Borrar 🗑️</button>
+                <div style="display: flex; gap: 8px;">
+                    <a href="#" class="btn-whatsapp-notify" style="display:none; background:#25D366; color:white; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:0.9rem;" title="Notificar por WhatsApp">WhatsApp 💬</a>
+                    <button class="btn btn-delete-order" data-id="${o.id}" style="background:var(--color-danger); color:white; padding:8px 14px; border-radius:8px; border:none; cursor:pointer;" title="Eliminar Pedido">Borrar 🗑️</button>
+                </div>
             </div>
         `;
         list.appendChild(card);
         
+        const waBtn = card.querySelector('.btn-whatsapp-notify');
+        
+        // Función para actualizar el enlace de WhatsApp
+        const updateWaLink = (status) => {
+            if(o.customerParams?.phone) {
+                const phone = o.customerParams.phone.replace(/\\D/g, '');
+                if(phone.length >= 10) {
+                    const mxPhone = "52" + phone.slice(-10);
+                    const customerName = o.customerParams?.name || "Cliente";
+                    let text = "";
+                    
+                    if(status === "Recibido") text = `¡Hola ${customerName}! Tu orden fue recibida en Pozole Express. 🐷🍲 Te avisaremos en cuanto empecemos a prepararla.`;
+                    else if(status === "En Preparacion") text = `¡Hola ${customerName}! Tu orden ya está en la cocina preparándose. 👨‍🍳🔥 Quedará deliciosa.`;
+                    else if(status === "En Camino") {
+                        if(o.deliveryParams?.type === 'pickup') text = `¡Hola ${customerName}! Tu pedido ya está empaquetado y listo en el mostrador. 🛍️📍 Te esperamos.`;
+                        else text = `¡Yuju ${customerName}! Tu pedido acaba de salir y ya va en camino a tu domicilio. 🛵💨 ¡Ve por los platos!`;
+                    }
+                    else if(status === "Entregado") text = `¡Gracias por tu compra en Pozole Express, ${customerName}! 🤤 Esperamos que lo disfrutes mucho. ¡Buen provecho!`;
+                    
+                    if(text) {
+                        waBtn.style.display = 'inline-block';
+                        // Usar intent:// para forzar WebViews de Android
+                        waBtn.href = `intent://send?phone=${mxPhone}&text=${encodeURIComponent(text)}#Intent;scheme=whatsapp;package=com.whatsapp;end;`;
+                        waBtn.target = "_blank";
+                    } else {
+                        waBtn.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        // Initialize button state
+        updateWaLink(o.status);
+
         card.querySelector('.status-selector').addEventListener('change', async (e) => {
             const newStatus = e.target.value;
             const success = await updateOrderStatus(o.id, newStatus);
             if(success) {
                 showToast("Estado de pedido actualizado");
-                
-                // Automatización WhatsApp
-                if(o.customerParams?.phone) {
-                    const phone = o.customerParams.phone.replace(/\\D/g, ''); // Limpiar símbolos
-                    if(phone.length >= 10) {
-                        // Forzar a México (+52) usando los últimos 10 dígitos (típicamente de MX)
-                        const mxPhone = "52" + phone.slice(-10);
-                        const customerName = o.customerParams?.name || "Cliente";
-                        let text = "";
-                        
-                        if(newStatus === "Recibido") {
-                            text = `¡Hola ${customerName}! Tu orden fue recibida en Pozole Express. 🐷🍲 Te avisaremos en cuanto empecemos a prepararla.`;
-                        } else if(newStatus === "En Preparacion") {
-                            text = `¡Hola ${customerName}! Tu orden ya está en la cocina preparándose. 👨‍🍳🔥 Quedará deliciosa.`;
-                        } else if(newStatus === "En Camino") {
-                            if(o.deliveryParams?.type === 'pickup') {
-                                text = `¡Hola ${customerName}! Tu pedido ya está empaquetado y listo en el mostrador. 🛍️📍 Te esperamos.`;
-                            } else {
-                                text = `¡Yuju ${customerName}! Tu pedido acaba de salir y ya va en camino a tu domicilio. 🛵💨 ¡Ve por los platos!`;
-                            }
-                        } else if(newStatus === "Entregado") {
-                            text = `¡Gracias por tu compra en Pozole Express, ${customerName}! 🤤 Esperamos que lo disfrutes mucho. ¡Buen provecho!`;
-                        }
-                        
-                        if(text && confirm(`¿Deseas enviar un WhatsApp a ${customerName} avisando que el pedido está '${newStatus}'?`)) {
-                            // Usar el protocolo nativo 'whatsapp://' para forzar a WebViews a abrir la app directamente
-                            window.location.href = `whatsapp://send?phone=${mxPhone}&text=${encodeURIComponent(text)}`;
-                        }
-                    }
-                }
+                updateWaLink(newStatus); // Cambiar el texto del whatsapp
+                // Auto-clickear no funciona en webviews cerrados, esperar click manual
             }
         });
 
