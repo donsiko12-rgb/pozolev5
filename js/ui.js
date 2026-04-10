@@ -257,7 +257,39 @@ export function renderAdminOrders(orders) {
         card.querySelector('.status-selector').addEventListener('change', async (e) => {
             const newStatus = e.target.value;
             const success = await updateOrderStatus(o.id, newStatus);
-            if(success) showToast("Estado de pedido actualizado");
+            if(success) {
+                showToast("Estado de pedido actualizado");
+                
+                // Automatización WhatsApp
+                if(o.customerParams?.phone) {
+                    const phone = o.customerParams.phone.replace(/\\D/g, ''); // Limpiar símbolos
+                    if(phone.length >= 10) {
+                        // Forzar a México (+52) usando los últimos 10 dígitos (típicamente de MX)
+                        const mxPhone = "52" + phone.slice(-10);
+                        const customerName = o.customerParams?.name || "Cliente";
+                        let text = "";
+                        
+                        if(newStatus === "Recibido") {
+                            text = `¡Hola ${customerName}! Tu orden fue recibida en Pozole Express. 🐷🍲 Te avisaremos en cuanto empecemos a prepararla.`;
+                        } else if(newStatus === "En Preparacion") {
+                            text = `¡Hola ${customerName}! Tu orden ya está en la cocina preparándose. 👨‍🍳🔥 Quedará deliciosa.`;
+                        } else if(newStatus === "En Camino") {
+                            if(o.deliveryParams?.type === 'pickup') {
+                                text = `¡Hola ${customerName}! Tu pedido ya está empaquetado y listo en el mostrador. 🛍️📍 Te esperamos.`;
+                            } else {
+                                text = `¡Yuju ${customerName}! Tu pedido acaba de salir y ya va en camino a tu domicilio. 🛵💨 ¡Ve por los platos!`;
+                            }
+                        } else if(newStatus === "Entregado") {
+                            text = `¡Gracias por tu compra en Pozole Express, ${customerName}! 🤤 Esperamos que lo disfrutes mucho. ¡Buen provecho!`;
+                        }
+                        
+                        if(text && confirm(`¿Deseas enviar un WhatsApp a ${customerName} avisando que el pedido está '${newStatus}'?`)) {
+                            // Abrir enlace oficial que redirecciona automáticamente a la App de WhatsApp
+                            window.open(`https://wa.me/${mxPhone}?text=${encodeURIComponent(text)}`, '_blank');
+                        }
+                    }
+                }
+            }
         });
 
         card.querySelector('.btn-delete-order').addEventListener('click', async (e) => {
