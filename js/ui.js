@@ -278,8 +278,14 @@ export function renderAdminOrders(orders) {
                     
                     if(text) {
                         waBtn.style.display = 'inline-block';
-                        // Usar intent:// para forzar WebViews de Android
-                        waBtn.href = `intent://send?phone=${mxPhone}&text=${encodeURIComponent(text)}#Intent;scheme=whatsapp;package=com.whatsapp;end;`;
+                        const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                        if(isMobile) {
+                            // En celular forzamos la app nativa con whatsapp://
+                            waBtn.href = `whatsapp://send?phone=${mxPhone}&text=${encodeURIComponent(text)}`;
+                        } else {
+                            // En PC usamos el hipervínculo web regular para evitar el error de esquema
+                            waBtn.href = `https://api.whatsapp.com/send?phone=${mxPhone}&text=${encodeURIComponent(text)}`;
+                        }
                         waBtn.target = "_blank";
                     } else {
                         waBtn.style.display = 'none';
