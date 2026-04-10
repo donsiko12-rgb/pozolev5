@@ -284,8 +284,8 @@ export function renderAdminOrders(orders) {
                         }
                         
                         if(text && confirm(`¿Deseas enviar un WhatsApp a ${customerName} avisando que el pedido está '${newStatus}'?`)) {
-                            // Abrir enlace oficial que redirecciona automáticamente a la App de WhatsApp
-                            window.open(`https://wa.me/${mxPhone}?text=${encodeURIComponent(text)}`, '_blank');
+                            // Usar el protocolo nativo 'whatsapp://' para forzar a WebViews a abrir la app directamente
+                            window.location.href = `whatsapp://send?phone=${mxPhone}&text=${encodeURIComponent(text)}`;
                         }
                     }
                 }
