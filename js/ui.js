@@ -40,11 +40,12 @@ export function renderProducts(products, currentCart) {
         let sub = p.desc;
         let imgSrc = '';
 
-        if(p.name.includes("Pozole")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = p.name.toUpperCase(); sub = "POZOL TOST"; imgSrc = "pozole.png"; }
-        else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; imgSrc = "cocacola.png"; }
-        else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; imgSrc = "aguasabor.png"; }
-        else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; imgSrc = "tostadatinga.png"; }
-        else if(p.name.includes("Pata")) { theme = 'theme-ochre'; tag = "CLÁSICA"; title = "TOSTADA DE PATA"; sub = "LA DELICIA DE PATA"; imgSrc = "tostadapata.png"; }
+        if(p.name.includes("Pozole Grande")) { theme = 'theme-ochre'; tag = "ORIGINAL"; title = p.name.toUpperCase(); sub = "POZOL TOST"; imgSrc = "pozolegrande2.png"; }
+        else if(p.name.includes("Pozole Chico")) { theme = 'theme-ochre'; tag = "IDEAL"; title = p.name.toUpperCase(); sub = "PARA EL ANTOJO"; imgSrc = "pozolechico2.png"; }
+        else if(p.name.includes("Refresco")) { theme = 'theme-red'; tag = "REFRESCO"; title = "NO ES POZOLE SIN UNA RICA COCA"; sub = "COKE TOST"; imgSrc = "cocacola2.png"; }
+        else if(p.name.includes("Agua")) { theme = 'theme-black'; tag = "TRADICIONAL"; title = "SI TE SIENTES FIT Y NO FAT"; sub = "UN AGUA LLEVAR"; imgSrc = "aguafresca2.png"; }
+        else if(p.name.includes("Tinga")) { theme = 'theme-red'; tag = "DELICIOSA"; title = "TOSTADA DE TINGA"; sub = "CRUJIENTE Y DELICIOSA"; imgSrc = "toastadatinga2.png"; }
+        else if(p.name.includes("Pata")) { theme = 'theme-ochre'; tag = "CLÁSICA"; title = "TOSTADA DE PATA"; sub = "LA DELICIA DE PATA"; imgSrc = "toastadapata2.png"; }
 
         const card = document.createElement('div');
         card.className = `promo-card ${theme}`;
